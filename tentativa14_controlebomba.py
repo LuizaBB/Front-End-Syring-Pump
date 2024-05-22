@@ -54,32 +54,25 @@ def time_responses(situation, start_active,exclusive_time):
         window["timer_status"].update("Active")
         initial=time.time()
         limit=initial+time_information[1]
-        # print("comecou timer active")
         while time.time()<limit:
             click, reading=window.read(timeout=1000*time_information[1])
             if click=="STOP1" or click=="STOP2" or click==" ":
                 time_responses('f', start_active,exclusive_time)
                 return True
             window['time'].update(time.ctime(time.time()))
-        # print(f"acabou timer active: {time.time()-initial}")
     if situation=='s':
         send_command("n")
         window["timer_status"].update("Sleep")
         initial=time.time()
         limit=initial+time_information[2]
-        # print("comecou timer sleep")
         while time.time()<limit:
             click, reading=window.read(timeout=1000*time_information[2])
             if click=="STOP1" or click=="STOP2" or click==" ":
                 time_responses('f', start_active,exclusive_time)
                 return True
-            # time_show=time.localtime()
-            # window['timer_show'].update(time_show.tm_hours, time_show.tm_min, time_show.tm_sec)
-        # print(f"acabou timer sleep: {time.time()-initial}")
     return False
 
 def time_control(hours, minutes,start_active, time_information, exclusive_time):
-    #nesse código analisar a necessidade de fazer um verificador de coerencia entre as informações de tempo ou nao
     if exclusive_time[0]==True:
         time_information[0]=ajusting_type(time_information[0])
         time_information[1]=time_information[0]
@@ -93,33 +86,24 @@ def time_control(hours, minutes,start_active, time_information, exclusive_time):
     if minutes==True:
         for index in range(0,3,1):
             time_information[index]=time_information[index] * 60
-    # initial_time=time.time() #apenas para print de testes
     current_time=time.time()
     break_point=False
     limit_time=current_time+time_information[0]
-    # print(exclusive_time)
     while current_time< limit_time:
-        # print(f"Time0: {current_time-initial_time} com start_active={start_active}")
         if start_active==True or exclusive_time[1]=="a":
-            # print("actvate")
             break_point=time_responses('a', start_active,exclusive_time)
-            # print(f"Time 1: {time.time()}")
             current_time=current_time+time_information[1]
         if start_active==False or exclusive_time[1]=='s':
-            # print("sleeping")
             break_point=time_responses('s', start_active,exclusive_time)
-            # print(f"Time 2: {time.time()}")
             current_time=current_time+time_information[2]
         if break_point==True:
             break
         start_active= not start_active
     time_responses('f', start, exclusive_time)
-    # print(f"Fim do processo: {limit_time-initial_time}")
 
 def send_command(final_command_line):
     visual_responses_main('g',1,final_command_line[0])
     if final_command_line[0]=="n":
-        # print(final_command_line)
         arduino.write(final_command_line.encode())
         arduino.flush()
     else:
@@ -127,7 +111,6 @@ def send_command(final_command_line):
         for item in final_command_line:
             command_phrase+=str(item)+" "
         command_phrase=command_phrase.strip()
-        # print(command_phrase)
         arduino.write(command_phrase.encode())
         arduino.flush()
         for index in range(0,3,2):
